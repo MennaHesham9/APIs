@@ -3,24 +3,67 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'dotnet build SOAPService.sln'
-                sh 'dotnet build RESTApi.sln'
-                sh 'dotnet build GrpcService.sln'
+                script {
+                    echo 'Building SOAPService...'
+                    if (isUnix()) {
+                        sh 'dotnet build SOAPService.sln'
+                    } else {
+                        bat 'dotnet build SOAPService.sln'
+                    }
+                    
+                    echo 'Building RESTApi...'
+                    if (isUnix()) {
+                        sh 'dotnet build RESTApi.sln'
+                    } else {
+                        bat 'dotnet build RESTApi.sln'
+                    }
+                    
+                    echo 'Building GrpcService...'
+                    if (isUnix()) {
+                        sh 'dotnet build GrpcService.sln'
+                    } else {
+                        bat 'dotnet build GrpcService.sln'
+                    }
+                }
             }
         }
+        
         stage('Test') {
             steps {
-                sh 'dotnet test'
+                script {
+                    echo 'Running tests...'
+                    if (isUnix()) {
+                        sh 'dotnet test'
+                    } else {
+                        bat 'dotnet test'
+                    }
+                }
             }
         }
+        
         stage('Docker Build') {
             steps {
-                sh 'docker-compose build'
+                script {
+                    echo 'Building Docker images...'
+                    if (isUnix()) {
+                        sh 'docker-compose build'
+                    } else {
+                        bat 'docker-compose build'
+                    }
+                }
             }
         }
+
         stage('Deploy') {
             steps {
-                sh 'docker-compose up -d'
+                script {
+                    echo 'Deploying containers...'
+                    if (isUnix()) {
+                        sh 'docker-compose up -d'
+                    } else {
+                        bat 'docker-compose up -d'
+                    }
+                }
             }
         }
     }
